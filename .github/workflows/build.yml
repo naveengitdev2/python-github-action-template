@@ -21,24 +21,14 @@ jobs:
         with:
           python-version: 3.x
 
-      - name: ACR build
-        id: build-push-acr
-        uses: azure/acr-build@v1
+      - name: Build and push Docker image
+        uses: azure/docker@v1
         with:
-          service_principal: ${{ secrets.service_principal }}
-          service_principal_password: ${{ secrets.service_principal_password }}
-          tenant: ${{ secrets.tenant }}
-          registry: ${{ secrets.AZURE_CONTAINER_REGISTRY }}
-#           repository: ${{ secrets.repository }}
-      - name: Set AKS context
-        id: set-context
-        uses: azure/aks-set-context@v3
-        with:
-          resource-group: '${{ secrets.resource_group }}' 
-          cluster-name: '${{ secrets.cluster_name }}'
-      - name: Setup kubectl
-        id: install-kubectl
-        uses: azure/setup-kubectl@v3
+          context: .
+          dockerfile: Dockerfile
+          imageName: ${{ env.AZURE_CONTAINER_REGISTRY }}/${{ env.IMAGE_NAME }}
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
 
       - name: Deploy to AKS
         run: |
