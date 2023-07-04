@@ -21,21 +21,24 @@ jobs:
         with:
           python-version: 3.x
 
-      - name: Login to Azure Container Registry
-        uses: azure/docker-login@v1
+      - name: ACR build
+        id: build-push-acr
+        uses: azure/acr-build@v1
         with:
-          login-server: ${{ env.ACR_LOGIN_SERVER }}
-          username: ${{ secrets.ACR_USERNAME }}
-          password: ${{ secrets.ACR_PASSWORD }}
-
-      - name: Build and push Docker image
-        uses: azure/docker@v1
+          service_principal: ${{ secrets.service_principal }}
+          service_principal_password: ${{ secrets.service_principal_password }}
+          tenant: ${{ secrets.tenant }}
+          registry: ${{ secrets.AZURE_CONTAINER_REGISTRY }}
+#           repository: ${{ secrets.repository }}
+      - name: Set AKS context
+        id: set-context
+        uses: azure/aks-set-context@v3
         with:
-          context: .
-          dockerfile: Dockerfile
-          imageName: ${{ env.AZURE_CONTAINER_REGISTRY }}/${{ env.IMAGE_NAME }}
-          username: ${{ secrets.ACR_USERNAME }}
-          password: ${{ secrets.ACR_PASSWORD }}
+          resource-group: '${{ secrets.resource_group }}' 
+          cluster-name: '${{ secrets.cluster_name }}'
+      - name: Setup kubectl
+        id: install-kubectl
+        uses: azure/setup-kubectl@v3
 
       - name: Deploy to AKS
         run: |
