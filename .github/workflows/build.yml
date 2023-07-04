@@ -34,7 +34,7 @@ jobs:
       
       - name: Build and push image to ACR
         run: |
-          az acr build --image ${{ secrets.ACR_LOGIN_SERVER }}.azurecr.io/k8sdemo:${{ github.sha }} --registry ${{ secrets.AZURE_CONTAINER_REGISTRY }} --file Dockerfile .
+           az acr build -t acrloki.azurecr.io/k8sdemo:${{ github.sha }} -r acrloki .
           
       - name: Set AKS context
         id: set-context
