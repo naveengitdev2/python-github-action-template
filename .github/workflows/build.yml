@@ -32,7 +32,7 @@ jobs:
           service_principal: ${{ secrets.service_principal }}
           service_principal_password: ${{ secrets.service_principal_password }}
           tenant: ${{ secrets.tenant }}
-          registry: ${{ secrets.ACR_LOGIN_SERVER }}
+          registry: ${{ secrets.AZURE_CONTAINER_REGISTRY }}
           repository: ${{ secrets.repository }}
 #           image:  azure-vote-front
 #           folder: azure-vote
