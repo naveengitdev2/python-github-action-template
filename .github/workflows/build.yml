@@ -32,7 +32,7 @@ jobs:
           service_principal_password: ${{ secrets.SERVICE_PRINCIPAL_PASSWORD }}
           tenant: ${{ secrets.TENANT }}
           registry: ${{ secrets.AZURE_CONTAINER_REGISTRY }}
-          repository: ${{ secrets.repository }}      
+#           repository: ${{ secrets.repository }}      
           branch: master
           tag: ${{ github.sha }}
           
