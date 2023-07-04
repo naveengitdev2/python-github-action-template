@@ -1,52 +1,43 @@
-name: build
-
+name: Build and Deploy
 on:
   push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+    branches:
+      - main
+
+env:
+  REGISTRY: ${{ secrets.AZURE_CONTAINER_REGISTRY }}
+  IMAGE_NAME: my-python-app
 
 jobs:
-
-  build:
-
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout source code 
-        uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-      - name: Setup Python
-        uses: actions/setup-python@v4
+      - name: Set up Python
+        uses: actions/setup-python@v2
         with:
-         python-version: '3.10'
+          python-version: 3.x
 
-#       - name: Verify that the Docker image for the action builds
-#         run: docker build . --file Dockerfile
+      - name: Login to Azure Container Registry
+        uses: azure/docker-login@v1
+        with:
+          login-server: ${{ env.ACR_LOGIN_SERVER }}
+          username: ${{ secrets.ACR_USERNAME }}
+          password: ${{ secrets.ACR_PASSWORD }}
 
-      - name: ACR build
-        id: build-push-acr
-        uses: azure/acr-build@v1
+      - name: Build and push Docker image
+        uses: azure/docker@v1
         with:
-          service_principal: ${{ secrets.SERVICE_PRINCIPAL }}
-          service_principal_password: ${{ secrets.SERVICE_PRINCIPAL_PASSWORD }}
-          tenant: ${{ secrets.TENANT }}
-          registry: ${{ secrets.AZURE_CONTAINER_REGISTRY }}
-#           repository: ${{ secrets.repository }}      
-          branch: master
-          tag: ${{ github.sha }}
-          
-      - name: Azure login
-        id: login
-        uses: azure/login@v1.4.3
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-      - name: Set AKS context
-        id: set-context
-        uses: azure/aks-set-context@v3
-        with:
-          resource-group: '${{ secrets.RESOURCE_GROUP }}' 
-          cluster-name: '${{ secrets.CLUSTER_NAME }}'
-      - name: Setup kubectl
-        id: install-kubectl
-        uses: azure/setup-kubectl@v3          
+          context: .
+          dockerfile: Dockerfile
+          imageName: ${{ env.AZURE_CONTAINER_REGISTRY }}/${{ env.IMAGE_NAME }}
+          username: ${{ secrets.ACR_USERNAME }}
+          password: ${{ secrets.ACR_PASSWORD }}
+
+      - name: Deploy to AKS
+        run: |
+          az acr build --registry ${{ env.AZURE_CONTAINER_REGISTRY }} --image ${{ env.IMAGE_NAME }} .
+          # Add commands to deploy the image to AKS (e.g., kubectl apply, helm upgrade)
