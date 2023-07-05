@@ -42,13 +42,13 @@ jobs:
    needs: build
    steps:
     - uses: actions/checkout@v2
-    - name: Set AKS context
-      id: set-context
-      uses: azure/aks-set-context@v3
+    
+    - uses: Azure/aks-set-context@v1
       with:
-        resource-group: '${{ secrets.resource_group }}' 
+        creds: '${{ secrets.AZURE_CREDENTIALS }}'
         cluster-name: '${{ secrets.cluster_name }}'
-
+        resource-group: '${{ secrets.resource_group }}' 
+      
     - uses: Azure/k8s-create-secret@v1
       with:
         container-registry-url: ${{ secrets.ACR_LOGIN_SERVER }}
