@@ -50,7 +50,7 @@ jobs:
           container-registry-password: ${{ secrets.ACR_PASSWORD }}
           secret-name: k8s-secret
 
-      - uses: Azure/k8s-deploy@v3
+      - uses: Azure/k8s-deploy@v4.9
         with:
           manifests: |
             manifests/deployment.yaml
