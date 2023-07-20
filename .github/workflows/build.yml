@@ -34,7 +34,7 @@ jobs:
       
       - name: Build and push image to ACR
         run: |
-           az acr build -t acrloki.azurecr.io/k8sdemo:${{ github.sha }} -r acrloki .
+           az acr build -t ${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ secrets.REPOSITORY }}:${{ github.sha }} -r ${{ secrets.AZURE_CONTAINER_REGISTRY }} .
 
   deploy:
 
@@ -62,6 +62,6 @@ jobs:
           manifests/deployment.yaml
           manifests/service.yaml
         images: |
-          acrloki.azurecr.io/k8sdemo:${{ github.sha }}
+          ${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ secrets.repository }}:${{ github.sha }}
         imagepullsecrets: |
             k8s-secret
