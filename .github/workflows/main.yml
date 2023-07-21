@@ -7,7 +7,7 @@ on:
       - main    
   release:
     types:
-      - 'created'
+      - created
 
 env:
   REGISTRY: ${{ secrets.AZURE_CONTAINER_REGISTRY }}
