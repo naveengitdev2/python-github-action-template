@@ -36,9 +36,32 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     environment: dev
-
     steps:
-     - uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
+        
+      - uses: Azure/aks-set-context@v1
+        with:
+           creds: '${{ secrets.AZURE_CREDENTIALS }}'
+           cluster-name: '${{ secrets.cluster_name }}'
+           resource-group: '${{ secrets.resource_group }}' 
+      
+      - uses: Azure/k8s-create-secret@v1
+        with:
+          container-registry-url: ${{ secrets.ACR_LOGIN_SERVER }}
+          container-registry-username: ${{ secrets.ACR_USERNAME }}
+          container-registry-password: ${{ secrets.ACR_PASSWORD }}
+          secret-name: k8s-secret
+
+      - uses: Azure/k8s-deploy@v4
+        with:
+          manifests: |
+            manifests/deployment.yaml
+            manifests/service.yaml
+          images: |
+            ${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ secrets.repository }}:${{ github.repository }}
+          imagepullsecrets: |
+           k8s-secret
 
   deploy-staging:
     runs-on: ubuntu-latest
@@ -48,6 +71,29 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+        
+      - uses: Azure/aks-set-context@v1
+        with:
+           creds: '${{ secrets.AZURE_CREDENTIALS }}'
+           cluster-name: '${{ secrets.cluster_name }}'
+           resource-group: '${{ secrets.resource_group }}' 
+      
+      - uses: Azure/k8s-create-secret@v1
+        with:
+          container-registry-url: ${{ secrets.ACR_LOGIN_SERVER }}
+          container-registry-username: ${{ secrets.ACR_USERNAME }}
+          container-registry-password: ${{ secrets.ACR_PASSWORD }}
+          secret-name: k8s-secret
+
+      - uses: Azure/k8s-deploy@v4
+        with:
+          manifests: |
+            manifests/deployment.yaml
+            manifests/service.yaml
+          images: |
+            ${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ secrets.repository }}:${{ github.repository }}
+          imagepullsecrets: |
+           k8s-secret
 
   deploy-production:
     runs-on: ubuntu-latest
