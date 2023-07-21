@@ -32,7 +32,7 @@ jobs:
       
       - name: Build and push image to ACR
         run: |
-           az acr build -t ${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ secrets.REPOSITORY }}:${{ github.repository }} -r ${{ secrets.AZURE_CONTAINER_REGISTRY }} .
+           az acr build -t ${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ secrets.REPOSITORY }}:${{ github.sha }} -r ${{ secrets.AZURE_CONTAINER_REGISTRY }} .
 
   deploy-dev:
     runs-on: ubuntu-latest
