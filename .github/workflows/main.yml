@@ -8,7 +8,7 @@ on:
   release:
     types:
       - created
-
+ 
 env:
   REGISTRY: ${{ secrets.AZURE_CONTAINER_REGISTRY }}
   IMAGE_NAME: ${{ github.repository }}
