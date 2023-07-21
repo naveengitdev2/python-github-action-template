@@ -3,8 +3,6 @@ on:
   push:
     branches:
       - 'main'
-      - 'dev'
-      - 'staging'
     tags:
       - '*'
   release:
@@ -36,14 +34,14 @@ jobs:
 
   deploy-dev:
     runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/')  #Only runs for tags
+    environment: dev
 
     steps:
      - uses: actions/checkout@v2
 
   deploy-staging:
     runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/')  #Only runs for tags
+    environment: staging
 
     steps:
       - name: Checkout code
@@ -51,6 +49,7 @@ jobs:
 
   deploy-production:
     runs-on: ubuntu-latest
+    environment: production
     if: startsWith(github.ref, 'refs/tags/release')  #Only runs for tags starting with 'release'
 
     steps:
