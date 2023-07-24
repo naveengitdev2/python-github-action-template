@@ -2,12 +2,12 @@ name: Build and Deploy
 on:
   push:
     tags:
-      - 'v*'
-    branches:
-      - main
-  release:
-    types:
-      - created
+      - '*'
+#     branches:
+#       - main
+#   release:
+#     types:
+#       - created
  
 env:
   REGISTRY: ${{ secrets.AZURE_CONTAINER_REGISTRY }}
