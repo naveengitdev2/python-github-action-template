@@ -130,3 +130,4 @@ jobs:
             ${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ secrets.repository }}:${{ github.sha }}
           imagepullsecrets: |
            k8s-secret
+           
