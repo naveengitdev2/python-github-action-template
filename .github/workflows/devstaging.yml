@@ -28,7 +28,7 @@ jobs:
           
       - name: Build and push image to ACR
         run: |
-           az acr build -t ${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ secrets.REPOSITORY }}:${{ steps.commit.outputs.ref }} -r ${{ secrets.AZURE_CONTAINER_REGISTRY }} .
+           az acr build -t ${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ secrets.REPOSITORY }}:${{ GITHUB.REF }} -r ${{ secrets.AZURE_CONTAINER_REGISTRY }} .
 
  # Deployment to Dev
   deploy-dev:
@@ -62,7 +62,7 @@ jobs:
             manifests/deployment.yaml
             manifests/service.yaml
           images: |
-            ${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ secrets.repository }}:${GITHUB_REF}
+            ${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ secrets.repository }}:${{ GITHUB.REF }}
           imagepullsecrets: |
            k8s-secret
 
@@ -76,13 +76,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
         
-      - name: Docker Build Tag Publish
-        uses: bitovi/github-actions-docker-publish@v1.0.7
-        with:
-          checkout: true
-          image_tag: true
-          use_sha: false
-          use_latest: true
+      - name: Get current git tag
+        uses: devops-actions/action-get-tag@v1.0.2
         
       - uses: Azure/aks-set-context@v1
         with:
@@ -103,6 +98,6 @@ jobs:
             manifests/deployment.yaml
             manifests/service.yaml
           images: |
-            ${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ secrets.repository }}:${GITHUB_REF}
+            ${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ secrets.repository }}:${{ GITHUB.REF }}
           imagepullsecrets: |
            k8s-secret
