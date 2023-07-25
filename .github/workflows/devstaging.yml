@@ -23,12 +23,22 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - uses: tenhaus/get-release-or-tag@v2
-        id: tag
-     
+#       - uses: tenhaus/get-release-or-tag@v2
+#         id: tag
+
+      - name: Docker metadata
+        id: metadata
+        uses: docker/metadata-action@v3
+        with:
+          images: ${{ env.IMG_NAME }}
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=raw,value={{sha}},enable=${{ github.ref_type != 'tag' }}
+            
       - name: Build and push image to ACR
         run: |
-           az acr build -t ${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ secrets.REPOSITORY }}:$(GITHUB_WORKFLOW_SHA) -r ${{ secrets.AZURE_CONTAINER_REGISTRY }} .
+           az acr build -t ${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ secrets.REPOSITORY }}:${{ steps.metadata.outputs.tags }} -r ${{ secrets.AZURE_CONTAINER_REGISTRY }} .
 
  # Deployment to Dev
   deploy-dev:
@@ -40,8 +50,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - uses: tenhaus/get-release-or-tag@v2
-        id: tag
+#       - uses: tenhaus/get-release-or-tag@v2
+#         id: tag
         
       - uses: Azure/aks-set-context@v1
         with:
@@ -62,7 +72,7 @@ jobs:
             manifests/deployment.yaml
             manifests/service.yaml
           images: |
-            ${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ secrets.repository }}:$(GITHUB_WORKFLOW_SHA)
+            ${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ secrets.repository }}:${{ steps.metadata.outputs.tags }}
           imagepullsecrets: |
            k8s-secret
 
@@ -76,8 +86,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
         
-      - uses: tenhaus/get-release-or-tag@v2
-        id: tags
+#       - uses: tenhaus/get-release-or-tag@v2
+#         id: tags
         
       - uses: Azure/aks-set-context@v1
         with:
@@ -98,6 +108,6 @@ jobs:
             manifests/deployment.yaml
             manifests/service.yaml
           images: |
-            ${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ secrets.repository }}:$(GITHUB_WORKFLOW_SHA)
+            ${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ secrets.repository }}:${{ steps.metadata.outputs.tags }}
           imagepullsecrets: |
            k8s-secret
