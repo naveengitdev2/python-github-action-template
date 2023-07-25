@@ -3,8 +3,8 @@ on:
   push:
     tags:
       - '*'
-    branches:
-      - main
+#     branches:
+#       - main
  
 env:
   REGISTRY: ${{ secrets.AZURE_CONTAINER_REGISTRY }}
@@ -28,12 +28,13 @@ jobs:
 #       - uses: tenhaus/get-release-or-tag@v2
 #         id: tag
 
-      - name: Get current git tag
-        uses: devops-actions/action-get-tag@v1.0.2
+      - name: Get tag
+        id: tag
+        uses: devops-actions/action-get-tag@v1.0.1
         
       - name: Build and push image to ACR
         run: |
-           az acr build -t ${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ secrets.REPOSITORY }}:${{ steps.tag.outputs.tag }} -r ${{ secrets.AZURE_CONTAINER_REGISTRY }} .
+           az acr build -t ${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ secrets.REPOSITORY }}:${{steps.tag.outputs.tag}} -r ${{ secrets.AZURE_CONTAINER_REGISTRY }} .
 
  # Deployment to Dev
   deploy-dev:
@@ -67,7 +68,7 @@ jobs:
             manifests/deployment.yaml
             manifests/service.yaml
           images: |
-            ${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ secrets.repository }}:${{ steps.tag.outputs.tag }}
+            ${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ secrets.repository }}:${{steps.tag.outputs.tag}}
           imagepullsecrets: |
            k8s-secret
 
@@ -103,6 +104,6 @@ jobs:
             manifests/deployment.yaml
             manifests/service.yaml
           images: |
-            ${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ secrets.repository }}:${{ steps.tag.outputs.tag }}
+            ${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ secrets.repository }}:${{steps.tag.outputs.tag}}
           imagepullsecrets: |
            k8s-secret
