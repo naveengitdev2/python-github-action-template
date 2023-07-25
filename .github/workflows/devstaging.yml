@@ -30,8 +30,6 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           push: true
-          build-args: |
-            version=${{ steps.tag.outputs.tag }}
           tags: ${{ steps.tag.outputs.tag }}
             
  # Deployment to Dev
