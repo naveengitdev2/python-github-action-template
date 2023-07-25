@@ -24,9 +24,12 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - uses: tenhaus/get-release-or-tag@v2
-        id: tag
-        
+#       - uses: tenhaus/get-release-or-tag@v2
+#         id: tag
+
+      - name: Get current git tag
+        uses: devops-actions/action-get-tag@v1.0.2
+  
       - name: Build and push image to ACR
         run: |
            az acr build -t ${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ secrets.REPOSITORY }}:${{ steps.tag.outputs.tag }} -r ${{ secrets.AZURE_CONTAINER_REGISTRY }} .
