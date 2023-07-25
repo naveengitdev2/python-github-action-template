@@ -23,13 +23,8 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
           
-      - name: Docker Build Tag Publish
-        uses: bitovi/github-actions-docker-publish@v1.0.7
-        with:
-          checkout: true
-          image_tag: true
-          use_sha: false
-          use_latest: true
+      - name: Get current git tag
+        uses: devops-actions/action-get-tag@v1.0.2
           
       - name: Build and push image to ACR
         run: |
@@ -45,13 +40,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Docker Build Tag Publish
-        uses: bitovi/github-actions-docker-publish@v1.0.7
-        with:
-          checkout: true
-          image_tag: true
-          use_sha: false
-          use_latest: true
+      - name: Get current git tag
+        uses: devops-actions/action-get-tag@v1.0.2
         
       - uses: Azure/aks-set-context@v1
         with:
