@@ -31,11 +31,6 @@ jobs:
       - run: |
           docker build . -t ${{ secrets.ACR_USERNAME }}.azurecr.io/k8sdemo:${{ steps.meta.outputs.tags }}
           docker push ${{ secrets.ACR_USERNAME }}.azurecr.io/k8sdemo:${{ steps.meta.outputs.tags }}
-          with:
-            context: .
-            push: true
-            tags: ${{ steps.meta.outputs.tags }}
-            labels: ${{ steps.meta.outputs.labels }}
             
  # Deployment to Dev
   deploy-dev:
