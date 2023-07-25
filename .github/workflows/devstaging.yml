@@ -23,12 +23,17 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
           
-      - name: Version or Commit SHA
-        uses: hsblhsn/version-or-commit-sha@v1.0.1
+      - name: Docker Build Tag Publish
+        uses: bitovi/github-actions-docker-publish@v1.0.7
+        with:
+          checkout: true
+          image_tag: true
+          use_sha: false
+          use_latest: true
           
       - name: Build and push image to ACR
         run: |
-           az acr build -t ${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ secrets.REPOSITORY }}:${GITHUB_REF} -r ${{ secrets.AZURE_CONTAINER_REGISTRY }} .
+           az acr build -t ${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ secrets.REPOSITORY }}:${{ steps.commit.outputs.ref }} -r ${{ secrets.AZURE_CONTAINER_REGISTRY }} .
 
  # Deployment to Dev
   deploy-dev:
@@ -40,8 +45,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Version or Commit SHA
-        uses: hsblhsn/version-or-commit-sha@v1.0.1
+      - name: Docker Build Tag Publish
+        uses: bitovi/github-actions-docker-publish@v1.0.7
+        with:
+          checkout: true
+          image_tag: true
+          use_sha: false
+          use_latest: true
         
       - uses: Azure/aks-set-context@v1
         with:
@@ -76,8 +86,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
         
-      - name: Version or Commit SHA
-        uses: hsblhsn/version-or-commit-sha@v1.0.1
+      - name: Docker Build Tag Publish
+        uses: bitovi/github-actions-docker-publish@v1.0.7
+        with:
+          checkout: true
+          image_tag: true
+          use_sha: false
+          use_latest: true
         
       - uses: Azure/aks-set-context@v1
         with:
