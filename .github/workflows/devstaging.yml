@@ -16,12 +16,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Builds and pushes an image up to your Azure Container Registry
-      - name: Azure login
-        id: login
-        uses: azure/login@v1.4.3
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
+#       # Builds and pushes an image up to your Azure Container Registry
+#       - name: Azure login
+#         id: login
+#         uses: azure/login@v1.4.3
+#         with:
+#           creds: ${{ secrets.AZURE_CREDENTIALS }}
           
       - name: Get current git tag
         uses: devops-actions/action-get-tag@v1.0.2
@@ -32,7 +32,7 @@ jobs:
 
       - uses: azure/docker-login@v1
         with:
-          login-server: ${{ secrets.ACR_LOGIN_SERVER }} # default: index.docker.io
+          login-server: ${{ secrets.ACR_LOGIN_SERVER }}
           username: ${{ secrets.ACR_USERNAME }}
           password: ${{ secrets.ACR_PASSWORD }}
         
