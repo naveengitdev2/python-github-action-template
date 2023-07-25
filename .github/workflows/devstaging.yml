@@ -22,14 +22,15 @@ jobs:
           username: ${{ secrets.ACR_USERNAME }}
           password: ${{ secrets.ACR_PASSWORD }}
 
-      - name: Get git tag (maintained)
-        uses: bcomnes/get-git-tag@v3.0.4
+      - name: Create tag artifact
+        uses: actions/upload-artifact@v2
         with:
-          tagRegexGroup: 1
+          name: ${{github.ref_name}}
+          path: Release
              
       - run: |
-          docker build -t ${{ secrets.ACR_USERNAME }}.azurecr.io/k8sdemo:${{ github.ref }}
-          docker push ${{ secrets.ACR_USERNAME }}.azurecr.io/k8sdemo:${{ github.ref }}
+          docker build -t ${{ secrets.ACR_USERNAME }}.azurecr.io/k8sdemo:${{ github.ref_name }}
+          docker push ${{ secrets.ACR_USERNAME }}.azurecr.io/k8sdemo:${{ github.ref_name }}
             
  # Deployment to Dev
   deploy-dev:
