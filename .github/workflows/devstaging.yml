@@ -16,24 +16,15 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
           
-      # Builds and pushes an image up to your Azure Container Registry
-      - name: Azure login
-        id: login
-        uses: azure/login@v1.4.3
+      - name: Extract metadata for the Docker image
+        id: meta
+        uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
         with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-        
-      - name: Get Tags  
-        id: gen_tags
-        run: |
-          if [[ $GITHUB_REF == 'refs/tags/'* ]]; then
-            TAGS='["user/image:latest","user/image:'${GITHUB_REF/refs\/tags\//}'"]'
-          else
-            TAGS='["user/image:latest"]'
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
             
       - name: Build and push image to ACR
         run: |
-           az acr build -t ${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ secrets.REPOSITORY }}:${steps.gen_tags.outputs.tags} -r ${{ secrets.AZURE_CONTAINER_REGISTRY }} .
+           az acr build -t ${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ secrets.REPOSITORY }}:${steps.meta.outputs.tags} -r ${{ secrets.AZURE_CONTAINER_REGISTRY }} .
 
  # Deployment to Dev
   deploy-dev:
@@ -45,11 +36,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Set Tag
-        run: |
-          # Set the tag to the commit SHA
-          TAG=$(git rev-parse --short ${{ github.sha }})
-          echo "TAG=$TAG" >> $GITHUB_ENV
+      - name: Extract metadata for the Docker image
+        id: meta
+        uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
         
       - uses: Azure/aks-set-context@v1
         with:
@@ -70,7 +61,7 @@ jobs:
             manifests/deployment.yaml
             manifests/service.yaml
           images: |
-            ${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ secrets.repository }}:${steps.gen_tags.outputs.tags}
+            ${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ secrets.repository }}:${steps.meta.outputs.tags}
           imagepullsecrets: |
            k8s-secret
 
@@ -84,11 +75,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
         
-      - name: Set Tag
-        run: |
-          # Set the tag to the commit SHA
-          TAG=$(git rev-parse --short ${{ github.sha }})
-          echo "TAG=$TAG" >> $GITHUB_ENV
+      - name: Extract metadata for the Docker image
+        id: meta
+        uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
         
       - uses: Azure/aks-set-context@v1
         with:
@@ -109,6 +100,6 @@ jobs:
             manifests/deployment.yaml
             manifests/service.yaml
           images: |
-            ${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ secrets.repository }}:${steps.gen_tags.outputs.tags}
+            ${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ secrets.repository }}:${steps.meta.outputs.tags}
           imagepullsecrets: |
            k8s-secret
