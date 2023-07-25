@@ -22,16 +22,18 @@ jobs:
         uses: azure/login@v1.4.3
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
-          
-      - name: Set Tag
+        
+      - name: Get Tags  
+        id: gen_tags
         run: |
-          # Set the tag to the commit SHA
-          TAG=$(git rev-parse --short ${{ github.sha }})
-          echo "TAG=$TAG" >> $GITHUB_ENV
+          if [[ $GITHUB_REF == 'refs/tags/'* ]]; then
+            TAGS='["user/image:latest","user/image:'${GITHUB_REF/refs\/tags\//}'"]'
+          else
+            TAGS='["user/image:latest"]'
             
       - name: Build and push image to ACR
         run: |
-           az acr build -t ${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ secrets.REPOSITORY }}:${TAG} -r ${{ secrets.AZURE_CONTAINER_REGISTRY }} .
+           az acr build -t ${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ secrets.REPOSITORY }}:${steps.gen_tags.outputs.tags} -r ${{ secrets.AZURE_CONTAINER_REGISTRY }} .
 
  # Deployment to Dev
   deploy-dev:
@@ -68,7 +70,7 @@ jobs:
             manifests/deployment.yaml
             manifests/service.yaml
           images: |
-            ${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ secrets.repository }}:${TAG}
+            ${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ secrets.repository }}:${steps.gen_tags.outputs.tags}
           imagepullsecrets: |
            k8s-secret
 
@@ -107,6 +109,6 @@ jobs:
             manifests/deployment.yaml
             manifests/service.yaml
           images: |
-            ${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ secrets.repository }}:${TAG}
+            ${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ secrets.repository }}:${steps.gen_tags.outputs.tags}
           imagepullsecrets: |
            k8s-secret
