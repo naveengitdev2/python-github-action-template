@@ -32,9 +32,9 @@ jobs:
              
       - run: |
           docker build -t ${{ secrets.ACR_USERNAME }}.azurecr.io/k8sdemo .
-          echo $GITHUB.REF
-          docker image tag ${{ secrets.ACR_USERNAME }}.azurecr.io/k8sdemo ${{ secrets.ACR_USERNAME }}.azurecr.io/k8sdemo:${{GITHUB.REF}}
-          docker push ${{ secrets.ACR_USERNAME }}.azurecr.io/k8sdemo:${{GITHUB.REF}}
+          echo $RELEASE_VERSION
+          docker image tag ${{ secrets.ACR_USERNAME }}.azurecr.io/k8sdemo ${{ secrets.ACR_USERNAME }}.azurecr.io/k8sdemo:$RELEASE_VERSION
+          docker push ${{ secrets.ACR_USERNAME }}.azurecr.io/k8sdemo:$RELEASE_VERSION
             
  # Deployment to Dev
   deploy-dev:
