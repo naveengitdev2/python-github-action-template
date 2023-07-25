@@ -16,14 +16,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
           
-      - name: Commit tagger
-        uses: tvdias/github-tagger@v0.0.2
-        with:
-          id : tag
+      - uses: tenhaus/get-release-or-tag@v2
+        id: tag
           
       - name: Build and push image to ACR
         run: |
-           az acr build -t ${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ secrets.REPOSITORY }}:${steps.tag.outputs.tags} -r ${{ secrets.AZURE_CONTAINER_REGISTRY }} .
+           az acr build -t ${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ secrets.REPOSITORY }}:${GITHUB_REF} -r ${{ secrets.AZURE_CONTAINER_REGISTRY }} .
 
  # Deployment to Dev
   deploy-dev:
@@ -35,10 +33,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Commit tagger
-        uses: tvdias/github-tagger@v0.0.2
-        with:
-          id : tag
+      - uses: tenhaus/get-release-or-tag@v2
+        id: tag
         
       - uses: Azure/aks-set-context@v1
         with:
@@ -59,7 +55,7 @@ jobs:
             manifests/deployment.yaml
             manifests/service.yaml
           images: |
-            ${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ secrets.repository }}:${steps.tag.outputs.tags}
+            ${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ secrets.repository }}:${GITHUB_REF}
           imagepullsecrets: |
            k8s-secret
 
@@ -73,10 +69,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
         
-      - name: Commit tagger
-        uses: tvdias/github-tagger@v0.0.2
-        with:
-          id : tag
+      - uses: tenhaus/get-release-or-tag@v2
+        id: tag
         
       - uses: Azure/aks-set-context@v1
         with:
@@ -97,6 +91,6 @@ jobs:
             manifests/deployment.yaml
             manifests/service.yaml
           images: |
-            ${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ secrets.repository }}:${steps.tag.outputs.tags}
+            ${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ secrets.repository }}:${GITHUB_REF}
           imagepullsecrets: |
            k8s-secret
