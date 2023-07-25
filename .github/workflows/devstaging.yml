@@ -16,9 +16,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Get tag
-        id: tag
-        uses: dawidd6/action-get-tag@v1
+      - name: Set Tag
+        id: get_tag
+        run: |
+          # Extract the tag name from the GITHUB_REF
+          TAG=$(echo "${{ github.ref }}" | sed -e 's/refs\/tags\///')
+          echo "TAG=$TAG" >> $GITHUB_ENV
         
       - uses: azure/docker-login@v1
         with:
@@ -26,11 +29,10 @@ jobs:
           username: ${{ secrets.ACR_USERNAME }}
           password: ${{ secrets.ACR_PASSWORD }}
 
-      - name: Build & Push
-        uses: docker/build-push-action@v2
-        with:
-          push: true
-          tags: ${{ steps.tag.outputs.tag }}
+      - name: Build and Push Docker image
+        run: |
+          docker build -t ${{ secrets.ACR_USERNAME }}.azurecr.io/k8sdemo:$TAG .
+          docker push ${{ secrets.ACR_USERNAME }}.azurecr.io/k8sdemo:$TAG
             
  # Deployment to Dev
   deploy-dev:
