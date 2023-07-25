@@ -22,15 +22,12 @@ jobs:
           username: ${{ secrets.ACR_USERNAME }}
           password: ${{ secrets.ACR_PASSWORD }}
 
-      - name: Set Tag
-        run: |
-          # Set the tag to the commit SHA
-          TAG=$(git rev-parse --short ${{ github.sha }})
-          echo "TAG=$TAG" >> $GITHUB_ENV
+      - name: Git Tag Based Build Version
+        uses: happygears/gt2v@v3
              
       - run: |
-          docker build -t ${{ secrets.ACR_USERNAME }}.azurecr.io/k8sdemo:$TAG .
-          docker push ${{ secrets.ACR_USERNAME }}.azurecr.io/k8sdemo:$TAG
+          docker build -t ${{ secrets.ACR_USERNAME }}.azurecr.io/k8sdemo:${{ github.ref }}
+          docker push ${{ secrets.ACR_USERNAME }}.azurecr.io/k8sdemo:${{ github.ref }}
             
  # Deployment to Dev
   deploy-dev:
