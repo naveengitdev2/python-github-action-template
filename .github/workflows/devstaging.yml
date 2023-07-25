@@ -30,7 +30,7 @@ jobs:
      
       - name: Build and push image to ACR
         run: |
-           az acr build -t ${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ secrets.REPOSITORY }}:$${{steps.tag.outputs.tags}} -r ${{ secrets.AZURE_CONTAINER_REGISTRY }} .
+           az acr build -t ${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ secrets.REPOSITORY }}:${{steps.tag.outputs.tags}} -r ${{ secrets.AZURE_CONTAINER_REGISTRY }} .
 
  # Deployment to Dev
   deploy-dev:
@@ -64,7 +64,7 @@ jobs:
             manifests/deployment.yaml
             manifests/service.yaml
           images: |
-            ${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ secrets.repository }}:${{.Run.ID}}
+            ${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ secrets.repository }}:${{steps.tag.outputs.tags}}
           imagepullsecrets: |
            k8s-secret
 
