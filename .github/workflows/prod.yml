@@ -16,20 +16,24 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-          
-      # Builds and pushes an image up to your Azure Container Registry
-      - name: Azure login
-        id: login
-        uses: azure/login@v1.4.3
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - uses: tenhaus/get-release-or-tag@v2
-        id: tag
-  
-      - name: Build and push image to ACR
+      - name: Set Tag
+        id: get_tag
         run: |
-           az acr build -t ${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ secrets.REPOSITORY }}:${{ steps.tag.outputs.tags }} -r ${{ secrets.AZURE_CONTAINER_REGISTRY }} .
+          # Extract the tag name from the GITHUB_REF
+          TAG=$(echo "${{ github.ref }}" | sed -e 's/refs\/tags\///')
+          echo "TAG=$TAG" >> $GITHUB_ENV
+        
+      - uses: azure/docker-login@v1
+        with:
+          login-server: ${{ secrets.ACR_LOGIN_SERVER }}
+          username: ${{ secrets.ACR_USERNAME }}
+          password: ${{ secrets.ACR_PASSWORD }}
+
+      - name: Build and Push Docker image
+        run: |
+          docker build -t ${{ secrets.ACR_USERNAME }}.azurecr.io/k8sdemo:$TAG .
+          docker push ${{ secrets.ACR_USERNAME }}.azurecr.io/k8sdemo:$TAG
 
 # Deployment to Production
   deploy-production:
@@ -40,9 +44,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-        
-      - uses: tenhaus/get-release-or-tag@v2
-        id: tag
         
       - uses: Azure/aks-set-context@v1
         with:
@@ -63,6 +64,6 @@ jobs:
             manifests/deployment.yaml
             manifests/service.yaml
           images: |
-            ${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ secrets.repository }}:${{ steps.tag.outputs.tags }}
+            ${{ secrets.ACR_USERNAME }}.azurecr.io/k8sdemo:$TAG
           imagepullsecrets: |
            k8s-secret
