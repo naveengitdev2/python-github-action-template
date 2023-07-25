@@ -16,15 +16,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
           
-      - name: Extract metadata for the Docker image
-        id: meta
-        uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
+      - name: Commit tagger
+        uses: tvdias/github-tagger@v0.0.2
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-            
+          id : tag
+          
       - name: Build and push image to ACR
         run: |
-           az acr build -t ${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ secrets.REPOSITORY }}:${steps.meta.outputs.tags} -r ${{ secrets.AZURE_CONTAINER_REGISTRY }} .
+           az acr build -t ${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ secrets.REPOSITORY }}:${steps.tag.outputs.tags} -r ${{ secrets.AZURE_CONTAINER_REGISTRY }} .
 
  # Deployment to Dev
   deploy-dev:
@@ -36,11 +35,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Extract metadata for the Docker image
-        id: meta
-        uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
+      - name: Commit tagger
+        uses: tvdias/github-tagger@v0.0.2
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          id : tag
         
       - uses: Azure/aks-set-context@v1
         with:
@@ -61,7 +59,7 @@ jobs:
             manifests/deployment.yaml
             manifests/service.yaml
           images: |
-            ${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ secrets.repository }}:${steps.meta.outputs.tags}
+            ${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ secrets.repository }}:${steps.tag.outputs.tags}
           imagepullsecrets: |
            k8s-secret
 
@@ -75,11 +73,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
         
-      - name: Extract metadata for the Docker image
-        id: meta
-        uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
+      - name: Commit tagger
+        uses: tvdias/github-tagger@v0.0.2
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          id : tag
         
       - uses: Azure/aks-set-context@v1
         with:
@@ -100,6 +97,6 @@ jobs:
             manifests/deployment.yaml
             manifests/service.yaml
           images: |
-            ${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ secrets.repository }}:${steps.meta.outputs.tags}
+            ${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ secrets.repository }}:${steps.tag.outputs.tags}
           imagepullsecrets: |
            k8s-secret
