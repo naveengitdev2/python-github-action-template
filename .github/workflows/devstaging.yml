@@ -15,6 +15,13 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+
+      # Builds and pushes an image up to your Azure Container Registry
+      - name: Azure login
+        id: login
+        uses: azure/login@v1.4.3
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
           
       - uses: tenhaus/get-release-or-tag@v2
         id: tag
