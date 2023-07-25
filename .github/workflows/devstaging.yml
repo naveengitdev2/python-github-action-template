@@ -3,8 +3,6 @@ on:
   push:
     tags:
       - '*'
-#     branches:
-#       - main
  
 env:
   REGISTRY: ${{ secrets.AZURE_CONTAINER_REGISTRY }}
