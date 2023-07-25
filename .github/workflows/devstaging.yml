@@ -29,8 +29,8 @@ jobs:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
              
       - run: |
-          docker build . -t ${{ secrets.ACR_USERNAME }}.azurecr.io/k8sdemo:${{ steps.commit.outputs.short }}
-          docker push ${{ secrets.ACR_USERNAME }}.azurecr.io/k8sdemo:${{ steps.commit.outputs.short }}
+          docker build . -t ${{ secrets.ACR_USERNAME }}.azurecr.io/k8sdemo:${{ steps.meta.outputs.tags }}
+          docker push ${{ secrets.ACR_USERNAME }}.azurecr.io/k8sdemo:${{ steps.meta.outputs.tags }}
           with:
             context: .
             push: true
