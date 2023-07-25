@@ -22,15 +22,15 @@ jobs:
           username: ${{ secrets.ACR_USERNAME }}
           password: ${{ secrets.ACR_PASSWORD }}
 
-      - name: Extract metadata for the Docker image
-        id: meta
-        uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+      - name: Set Tag
+        run: |
+          # Set the tag to the commit SHA
+          TAG=$(git rev-parse --short ${{ github.sha }})
+          echo "TAG=$TAG" >> $GITHUB_ENV
              
       - run: |
-          docker build . -t ${{ secrets.ACR_USERNAME }}.azurecr.io/k8sdemo:${{ steps.meta.outputs.tags }}
-          docker push ${{ secrets.ACR_USERNAME }}.azurecr.io/k8sdemo:${{ steps.meta.outputs.tags }}
+          docker build . -t ${{ secrets.ACR_USERNAME }}.azurecr.io/k8sdemo:$TAG .
+          docker push ${{ secrets.ACR_USERNAME }}.azurecr.io/k8sdemo:$TAG
             
  # Deployment to Dev
   deploy-dev:
