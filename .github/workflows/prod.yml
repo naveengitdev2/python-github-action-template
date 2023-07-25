@@ -2,6 +2,8 @@ name: Build and Deploy
 on:
   release:
     types: [published]
+    branches:
+      - main   
  
 env:
   REGISTRY: ${{ secrets.AZURE_CONTAINER_REGISTRY }}
