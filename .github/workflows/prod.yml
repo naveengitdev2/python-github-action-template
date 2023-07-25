@@ -24,8 +24,8 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-#       - uses: tenhaus/get-release-or-tag@v2
-#         id: tag
+      - uses: tenhaus/get-release-or-tag@v2
+        id: tag
 
       - name: Get current git tag
         uses: devops-actions/action-get-tag@v1.0.2
