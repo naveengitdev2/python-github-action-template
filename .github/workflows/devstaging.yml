@@ -31,8 +31,8 @@ jobs:
           echo ${{ env.RELEASE_VERSION }}
              
       - run: |
-          docker build -t ${{ secrets.ACR_USERNAME }}.azurecr.io/k8sdemo:${{ GITHUB.REF }} .
-          docker push ${{ secrets.ACR_USERNAME }}.azurecr.io/k8sdemo:${{ GITHUB.REF }}
+          docker build -t ${{ secrets.ACR_USERNAME }}.azurecr.io/k8sdemo .
+          docker push ${{ secrets.ACR_USERNAME }}.azurecr.io/k8sdemo
             
  # Deployment to Dev
   deploy-dev:
