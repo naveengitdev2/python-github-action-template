@@ -26,8 +26,8 @@ jobs:
         uses: happygears/gt2v@v3
              
       - run: |
-          docker build -t ${{ secrets.ACR_USERNAME }}.azurecr.io/k8sdemo:${{ github.ref }}
-          docker push ${{ secrets.ACR_USERNAME }}.azurecr.io/k8sdemo:${{ github.ref }}
+          docker build -t ${{ secrets.ACR_USERNAME }}.azurecr.io/k8sdemo:${{ github.sha }}
+          docker push ${{ secrets.ACR_USERNAME }}.azurecr.io/k8sdemo:${{ github.sha }}
             
  # Deployment to Dev
   deploy-dev:
