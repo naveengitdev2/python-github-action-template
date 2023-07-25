@@ -29,7 +29,7 @@ jobs:
           echo "TAG=$TAG" >> $GITHUB_ENV
              
       - run: |
-          docker build . -t ${{ secrets.ACR_USERNAME }}.azurecr.io/k8sdemo:$TAG .
+          docker build -t ${{ secrets.ACR_USERNAME }}.azurecr.io/k8sdemo:$TAG .
           docker push ${{ secrets.ACR_USERNAME }}.azurecr.io/k8sdemo:$TAG
             
  # Deployment to Dev
