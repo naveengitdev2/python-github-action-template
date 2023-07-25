@@ -6,7 +6,7 @@ on:
     branches:
       - main
   release:
-    types: [created, published, edited]
+    types: [published]
  
 env:
   REGISTRY: ${{ secrets.AZURE_CONTAINER_REGISTRY }}
