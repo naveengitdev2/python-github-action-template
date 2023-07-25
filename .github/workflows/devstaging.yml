@@ -26,10 +26,14 @@ jobs:
       - name: Get current git tag
         uses: devops-actions/action-get-tag@v1.0.2
           
-      - name: Build and push image to ACR
-        run: |
-           az acr build -t ${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ secrets.REPOSITORY }}:$TAG -r ${{ secrets.AZURE_CONTAINER_REGISTRY }} .
+#       - name: Build and push image to ACR
+#         run: |
+#            az acr build -t ${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ secrets.REPOSITORY }}:$TAG -r ${{ secrets.AZURE_CONTAINER_REGISTRY }} .
 
+      - run: |
+          docker build . -t ${{ secrets.ACR_USERNAME }}.azurecr.io/k8sdemo:${{ github.sha }}
+          docker push ${{ secrets.ACR_USERNAME }}.azurecr.io/k8sdemo:${{ github.sha }}
+        
  # Deployment to Dev
   deploy-dev:
     runs-on: ubuntu-latest
@@ -62,7 +66,7 @@ jobs:
             manifests/deployment.yaml
             manifests/service.yaml
           images: |
-            ${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ secrets.repository }}:$TAG
+            ${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ secrets.repository }}:{{ github.sha }}
           imagepullsecrets: |
            k8s-secret
 
@@ -98,6 +102,6 @@ jobs:
             manifests/deployment.yaml
             manifests/service.yaml
           images: |
-            ${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ secrets.repository }}:$TAG
+            ${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ secrets.repository }}:{{ github.sha }}
           imagepullsecrets: |
            k8s-secret
