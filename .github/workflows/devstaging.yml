@@ -22,8 +22,9 @@ jobs:
         uses: azure/login@v1.4.3
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
-
-      - uses: tenhaus/get-release-or-tag@v2
+          
+      - name: Add Git Tag
+        uses: cardinalby/git-tag-action@v1.0
         id: tag
             
       - name: Build and push image to ACR
@@ -40,7 +41,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - uses: tenhaus/get-release-or-tag@v2
+      - name: Add Git Tag
+        uses: cardinalby/git-tag-action@v1.0
         id: tag
         
       - uses: Azure/aks-set-context@v1
@@ -76,8 +78,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
         
-      - uses: tenhaus/get-release-or-tag@v2
-        id: tags
+      - name: Add Git Tag
+        uses: cardinalby/git-tag-action@v1.0
+        id: tag
         
       - uses: Azure/aks-set-context@v1
         with:
