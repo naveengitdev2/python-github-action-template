@@ -23,18 +23,8 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-#       - uses: tenhaus/get-release-or-tag@v2
-#         id: tag
-
-      - name: Docker metadata
-        id: metadata
-        uses: docker/metadata-action@v3
-        with:
-          images: ${{ env.IMG_NAME }}
-          tags: |
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=raw,value={{sha}},enable=${{ github.ref_type != 'tag' }}
+      - uses: tenhaus/get-release-or-tag@v2
+        id: tag
             
       - name: Build and push image to ACR
         run: |
