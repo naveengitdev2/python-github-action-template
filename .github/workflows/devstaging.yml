@@ -22,8 +22,11 @@ jobs:
           username: ${{ secrets.ACR_USERNAME }}
           password: ${{ secrets.ACR_PASSWORD }}
 
-      - name: Git Tag Based Build Version
-        uses: happygears/gt2v@v3
+      - name: Get git tag
+        uses: little-core-labs/get-git-tag@v3.0.2
+        with:
+          tagRegex: default
+          tagRegexGroup: 1
              
       - run: |
           docker build -t ${{ secrets.ACR_USERNAME }}.azurecr.io/k8sdemo:${{ github.sha }}
