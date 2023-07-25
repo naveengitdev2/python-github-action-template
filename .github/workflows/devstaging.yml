@@ -19,7 +19,6 @@ jobs:
       - name: Set Tag
         id: get_tag
         run: |
-          # Extract the tag name from the GITHUB_REF
           TAG=$(echo "${{ github.ref }}" | sed -e 's/refs\/tags\///')
           echo "TAG=$TAG" >> $GITHUB_ENV
         
