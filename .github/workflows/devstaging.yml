@@ -16,25 +16,23 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Get tag
+        id: tag
+        uses: dawidd6/action-get-tag@v1
+        
       - uses: azure/docker-login@v1
         with:
           login-server: ${{ secrets.ACR_LOGIN_SERVER }}
           username: ${{ secrets.ACR_USERNAME }}
           password: ${{ secrets.ACR_PASSWORD }}
 
-      - uses: actions/checkout@v2
-      - name: Set env
-        run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB.REF
-      - name: Image
-        run: |
-          echo $RELEASE_VERSION
-          echo ${{ env.RELEASE_VERSION }}
-             
-      - run: |
-          docker build -t ${{ secrets.ACR_USERNAME }}.azurecr.io/k8sdemo .
-          echo $GITHUB.REF
-          docker tag ${{ secrets.ACR_USERNAME }}.azurecr.io/k8sdemo ${{ secrets.ACR_USERNAME }}.azurecr.io/k8sdemo:$GITHUB.REF
-          docker push ${{ secrets.ACR_USERNAME }}.azurecr.io/k8sdemo:$GITHUB.REF
+      - name: Build & Push
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          build-args: |
+            version=${{ steps.tag.outputs.tag }}
+          tags: ${{ secrets.ACR_ENDPOINT }}/${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.tag }}
             
  # Deployment to Dev
   deploy-dev:
