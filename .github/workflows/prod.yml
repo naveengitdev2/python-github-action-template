@@ -1,69 +1,69 @@
-name: Build and Deploy Prod
-on:
-  release:
-    types: [published, edited]
-    branches:
-      - main   
+# name: Build and Deploy Prod
+# on:
+#   release:
+#     types: [published, edited]
+#     branches:
+#       - main   
  
-env:
-  REGISTRY: ${{ secrets.AZURE_CONTAINER_REGISTRY }}
-  IMAGE_NAME: ${{ github.repository }}
+# env:
+#   REGISTRY: ${{ secrets.AZURE_CONTAINER_REGISTRY }}
+#   IMAGE_NAME: ${{ github.repository }}
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
+# jobs:
+#   build:
+#     runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+#     steps:
+#       - name: Checkout code
+#         uses: actions/checkout@v3
 
-      - name: Set Tag
-        id: get_tag
-        run: |
-          TAG=$(echo "${{ github.ref }}" | sed -e 's/refs\/tags\///')
-          echo "TAG=$TAG" >> $GITHUB_ENV
+#       - name: Set Tag
+#         id: get_tag
+#         run: |
+#           TAG=$(echo "${{ github.ref }}" | sed -e 's/refs\/tags\///')
+#           echo "TAG=$TAG" >> $GITHUB_ENV
         
-      - uses: azure/docker-login@v1
-        with:
-          login-server: ${{ secrets.ACR_LOGIN_SERVER }}
-          username: ${{ secrets.ACR_USERNAME }}
-          password: ${{ secrets.ACR_PASSWORD }}
+#       - uses: azure/docker-login@v1
+#         with:
+#           login-server: ${{ secrets.ACR_LOGIN_SERVER }}
+#           username: ${{ secrets.ACR_USERNAME }}
+#           password: ${{ secrets.ACR_PASSWORD }}
 
-      - name: Build and Push Docker image
-        run: |
-          docker build -t ${{ secrets.ACR_USERNAME }}.azurecr.io/k8sdemo:$TAG .
-          docker push ${{ secrets.ACR_USERNAME }}.azurecr.io/k8sdemo:$TAG
+#       - name: Build and Push Docker image
+#         run: |
+#           docker build -t ${{ secrets.ACR_USERNAME }}.azurecr.io/k8sdemo:$TAG .
+#           docker push ${{ secrets.ACR_USERNAME }}.azurecr.io/k8sdemo:$TAG
 
-# Deployment to Production
-  deploy-production:
-    runs-on: ubuntu-latest
-    needs: build
-    if: startsWith(github.ref, 'refs/tags/release')  #Only runs for tags starting with 'release'
+# # Deployment to Production
+#   deploy-production:
+#     runs-on: ubuntu-latest
+#     needs: build
+#     if: startsWith(github.ref, 'refs/tags/release')  #Only runs for tags starting with 'release'
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+#     steps:
+#       - name: Checkout code
+#         uses: actions/checkout@v2
         
-      - uses: Azure/aks-set-context@v1
-        with:
-           creds: '${{ secrets.AZURE_CREDENTIALS }}'
-           cluster-name: '${{ secrets.CLUSTER_NAME_PROD }}'
-           resource-group: '${{ secrets.resource_group }}' 
+#       - uses: Azure/aks-set-context@v1
+#         with:
+#            creds: '${{ secrets.AZURE_CREDENTIALS }}'
+#            cluster-name: '${{ secrets.CLUSTER_NAME_PROD }}'
+#            resource-group: '${{ secrets.resource_group }}' 
       
-      - uses: Azure/k8s-create-secret@v1
-        with:
-          container-registry-url: ${{ secrets.ACR_LOGIN_SERVER }}
-          container-registry-username: ${{ secrets.ACR_USERNAME }}
-          container-registry-password: ${{ secrets.ACR_PASSWORD }}
-          secret-name: k8s-secret
+#       - uses: Azure/k8s-create-secret@v1
+#         with:
+#           container-registry-url: ${{ secrets.ACR_LOGIN_SERVER }}
+#           container-registry-username: ${{ secrets.ACR_USERNAME }}
+#           container-registry-password: ${{ secrets.ACR_PASSWORD }}
+#           secret-name: k8s-secret
 
-      - uses: Azure/k8s-deploy@v4
-        with:
-          action: deploy
-          manifests: |
-            manifests/deployment.yaml
-            manifests/service.yaml
-          images: |
-            ${{ secrets.ACR_USERNAME }}.azurecr.io/k8sdemo:$TAG
-          imagepullsecrets: |
-           k8s-secret
+#       - uses: Azure/k8s-deploy@v4
+#         with:
+#           action: deploy
+#           manifests: |
+#             manifests/deployment.yaml
+#             manifests/service.yaml
+#           images: |
+#             ${{ secrets.ACR_USERNAME }}.azurecr.io/k8sdemo:$TAG
+#           imagepullsecrets: |
+#            k8s-secret
