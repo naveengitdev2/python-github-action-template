@@ -47,7 +47,7 @@ jobs:
       - uses: Azure/aks-set-context@v1
         with:
            creds: '${{ secrets.AZURE_CREDENTIALS }}'
-           cluster-name: '${{ secrets.cluster_name_prod }}'
+           cluster-name: '${{ secrets.CLUSTER_NAME_PROD }}'
            resource-group: '${{ secrets.resource_group }}' 
       
       - uses: Azure/k8s-create-secret@v1
