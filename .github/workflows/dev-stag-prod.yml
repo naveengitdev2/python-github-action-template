@@ -6,9 +6,8 @@ on:
     branches:
       - main
   release:
-    types: [published, edited]
-    branches:
-      - main
+    types:
+      - created
  
 env:
   REGISTRY: ${{ secrets.AZURE_CONTAINER_REGISTRY }}
@@ -109,7 +108,7 @@ jobs:
       - uses: Azure/aks-set-context@v1
         with:
            creds: '${{ secrets.AZURE_CREDENTIALS }}'
-           cluster-name: '${{ secrets.CLUSTER_NAME_PROD }}'
+           cluster-name: '${{ secrets.cluster_name_prod }}'
            resource-group: '${{ secrets.resource_group }}' 
       
       - uses: Azure/k8s-create-secret@v1
